@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import xblydxj.qq.R;
 import xblydxj.qq.bean.Contact;
@@ -22,10 +23,10 @@ import xblydxj.qq.bean.Contact;
 public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ViewHolder> {
     private List<Contact> ContactData = new ArrayList<>();
     private Context mContext;
-    private int prePosition = 0;
-    public ContactRecyclerAdapter(Context context, List<Contact> data) {
+//    private int prePosition = 0;
+    public ContactRecyclerAdapter(Context context, Set<Contact> data) {
         mContext = context;
-        ContactData = data;
+        ContactData.addAll(data);
     }
 
     @Override
@@ -40,9 +41,11 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         setContactAvatar(holder, contact);
         holder.mContact_item_name.setText(contact.name);
         holder.mContact_item_letter.setText(contact.initial);
-        Log.d("tag", "adapter");
-        if (prePosition != 0 && ContactData.get(prePosition).initial.equals(contact.initial)) {
+        if (position != 0 && ContactData.get(position-1).initial.equals(contact.initial)) {
+            Log.d("tag", "gone");
             holder.mContact_item_card.setVisibility(View.GONE);
+        }else {
+            holder.mContact_item_card.setVisibility(View.VISIBLE);
         }
     }
 

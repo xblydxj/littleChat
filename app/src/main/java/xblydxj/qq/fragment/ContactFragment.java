@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import xblydxj.qq.R;
 import xblydxj.qq.activity.AddContactActivity;
@@ -34,7 +36,13 @@ public class ContactFragment extends BaseFragment {
     private CardView contact_center_tip_card;
     private RecyclerView mContact_recycler;
 
-    private List<Contact> data = new ArrayList<>();
+    private Set<Contact> data = new TreeSet<>(new Comparator<Contact>() {
+        @Override
+        public int compare(Contact preContact, Contact contact) {
+            int i = (int) preContact.initial.charAt(0) - (int) contact.initial.charAt(0);
+            return i==0?1:i;
+        }
+    });
     private List<String> mUserNames;
 
     public ContactFragment() {
@@ -54,33 +62,25 @@ public class ContactFragment extends BaseFragment {
 
     @Override
     protected void initData(View view) {
-        Log.d("tag", "111");
         initContactList();
-        Log.d("tag", "222");
         mContact_recycler = (RecyclerView) view.findViewById(R.id.contact_recycler);
         if (data.size() == 0) {
-            Log.d("tag", "0");
             return;
         }
         ContactRecyclerAdapter contactRecyclerAdapter = new ContactRecyclerAdapter(getContext(), data);
-        Log.d("tag", "333");
         mContact_recycler.setLayoutManager(new LinearLayoutManager(getContext()));//这里用线性显示 类似于listview
         mContact_recycler.setAdapter(contactRecyclerAdapter);
-        Log.d("tag", "444");
     }
 
     private void initContactList() {
-        Log.d("tag", "1112");
 //        try {
 //            mUserNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
             UsernameTest();
             for (int i = 0; i < mUserNames.size(); i++) {
-                Log.d("tag", "1113");
                 Contact contact = new Contact();
                 contact.avatar = i % 8;
                 contact.name = mUserNames.get(i);
                 contact.initial = getInitial(mUserNames.get(i));
-                Log.d("tag", "initial:"+contact.initial);
                 data.add(contact);
             }
 //        } catch (HyphenateException e) {
@@ -89,7 +89,6 @@ public class ContactFragment extends BaseFragment {
     }
 
     private void UsernameTest() {
-        Log.d("tag", "1114");
         mUserNames = new ArrayList<>();
         mUserNames.add("asd");
         mUserNames.add("asasd");
