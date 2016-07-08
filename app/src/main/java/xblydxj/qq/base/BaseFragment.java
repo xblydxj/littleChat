@@ -24,12 +24,12 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        View view = getView();
+        View view = this.getView();
         ImageView iv_left = (ImageView) view.findViewById(R.id.iv_left);
         ImageView iv_right = (ImageView) view.findViewById(R.id.iv_right);
         TextView tv_title = (TextView) view.findViewById(R.id.tv_title);
         initHeader(iv_left, tv_title, iv_right);
-        initData(view);
+        initData(getView());
     }
 
     protected abstract void initHeader(ImageView iv_left, TextView tv_title, ImageView iv_right);

@@ -19,8 +19,7 @@ public class ContactFragment extends BaseFragment {
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        inflater.inflate(R.layout.fragment_contact, container);
-        return null;
+        return inflater.inflate(R.layout.fragment_contact, container, false);
     }
 
     @Override

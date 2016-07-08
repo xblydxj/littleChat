@@ -10,17 +10,14 @@ import android.widget.TextView;
 import xblydxj.qq.R;
 import xblydxj.qq.base.BaseFragment;
 
-/**
- * Created by 46321 on 2016/7/8/008.
- */
+
 public class ConversationFragment extends BaseFragment {
     public ConversationFragment() {
     }
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        inflater.inflate(R.layout.fragment_conversation, container);
-        return null;
+        return inflater.inflate(R.layout.fragment_conversation, container, false);
     }
 
     @Override

@@ -3,7 +3,6 @@ package xblydxj.qq.activity;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.hyphenate.chat.EMClient;
 import com.roughike.bottombar.BottomBar;
@@ -22,7 +21,7 @@ import xblydxj.qq.fragment.PluginFragment;
 
 public class MainActivity extends BaseActivity {
     private BottomBar mBottomBar;
-    private List<BaseFragment> fragmentList = new ArrayList<BaseFragment>();
+    private List<BaseFragment> fragmentList = new ArrayList<>();
     private int currentIndex = 0;
 
     @Override
@@ -34,6 +33,13 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
+        initBottom(savedInstanceState);
+        EMClient.getInstance().chatManager().loadAllConversations();
+        initFragment();
+        initListener();
+    }
+
+    private void initBottom(Bundle savedInstanceState) {
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.main_bottom);
         mBottomBar.setActiveTabColor(ContextCompat.getColor(this, R.color.md_teal_500_color_code));
@@ -42,16 +48,13 @@ public class MainActivity extends BaseActivity {
         unRead.setCount(15);
         unRead.setAnimationDuration(200);
         unRead.setAutoShowAfterUnSelection(true);
-        EMClient.getInstance().chatManager().loadAllConversations();
-        initFragment();
-        initListener();
+
     }
 
     private void initListener() {
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
             @Override
             public void onMenuTabSelected(@IdRes int menuItemId) {
-                Log.d("tag", "12346131");
                 int index = 0;
                 if (menuItemId == R.id.bottomBarItemOne) {
                     index = 0;
@@ -60,7 +63,9 @@ public class MainActivity extends BaseActivity {
                 } else if (menuItemId == R.id.bottomBarItemThree) {
                     index = 2;
                 }
-
+                if (index == currentIndex) {
+                    return;
+                }
                 BaseFragment fragment = fragmentList.get(index);
                 if (fragment.isAdded()) {
                     getSupportFragmentManager().beginTransaction()
