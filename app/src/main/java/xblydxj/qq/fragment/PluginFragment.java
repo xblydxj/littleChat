@@ -19,9 +19,7 @@ import xblydxj.qq.base.BaseFragment;
 import xblydxj.qq.utils.DialogUtil;
 import xblydxj.qq.utils.Snackutils;
 
-/**
- * Created by 46321 on 2016/7/8/008.
- */
+
 public class PluginFragment extends BaseFragment {
 
     private Button mLogout;
