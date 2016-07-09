@@ -13,6 +13,7 @@
         android:orientation="horizontal"
     >
         <ImageView
+            android:id="@+id/add_contact_avatar"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="10dp"

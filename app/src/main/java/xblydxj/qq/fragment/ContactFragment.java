@@ -80,6 +80,7 @@ public class ContactFragment extends BaseFragment implements SwipeRefreshLayout.
             @Override
             public void call(Subscriber<? super Contact> subscriber) {
                 try {
+                    data.clear();
                     List<String> contactsFromServer = getEMClientData();
                     for (int i = 0; i < contactsFromServer.size(); i++) {
                         Contact contact = new Contact();
