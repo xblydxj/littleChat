@@ -2,6 +2,7 @@ package xblydxj.qq.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,22 +13,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import xblydxj.qq.R;
 import xblydxj.qq.activity.AddContactActivity;
 import xblydxj.qq.adapter.ContactRecyclerAdapter;
 import xblydxj.qq.base.BaseFragment;
 import xblydxj.qq.bean.Contact;
+import xblydxj.qq.utils.DBUtils;
 import xblydxj.qq.utils.PinyinUtils;
 import xblydxj.qq.widget.SlideBar;
 
 /**
  * Created by 46321 on 2016/7/8/008.
  */
-public class ContactFragment extends BaseFragment {
+public class ContactFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = ContactFragment.class.getSimpleName();
 
     private RecyclerView contact_recycler;
@@ -37,15 +44,12 @@ public class ContactFragment extends BaseFragment {
     private CardView contact_center_tip_card;
     private RecyclerView mContact_recycler;
 
-    private List<Contact> data = new ArrayList<>();/*new Comparator<Contact>() {
-        @Override
-        public int compare(Contact preContact, Contact contact) {
-            int i = (int) preContact.initial.charAt(0) - (int) contact.initial.charAt(0);
-            return i == 0 ? 1 : i;
-        }
-    });*/
+    private List<Contact> data = new ArrayList<>();
     private List<String> mUserNames;
     private String mCurrentUser;
+    private SwipeRefreshLayout mContact_refresh;
+    private ContactRecyclerAdapter mContactRecyclerAdapter;
+    private List<String> mContactsFromServer;
 
     public ContactFragment() {
     }
@@ -64,72 +68,100 @@ public class ContactFragment extends BaseFragment {
 
     @Override
     protected void initData(View view) {
-        initContactList();
-        mContact_recycler = (RecyclerView) view.findViewById(R.id.contact_recycler);
-        if (data != null && data.size() > 0) {
-            ContactRecyclerAdapter contactRecyclerAdapter = new ContactRecyclerAdapter(getContext(), data);
-            mContact_recycler.setLayoutManager(new LinearLayoutManager(getContext()));//这里用线性显示 类似于listview
-            mContact_recycler.setAdapter(contactRecyclerAdapter);
-            contactRecyclerAdapter.notifyDataSetChanged();
-        }
+        initSwipeRefresh(view);
+        initRecycler(view);
+        mCurrentUser = EMClient.getInstance().getCurrentUser();
+        loadContactFromDB();
+        loadContactFromServer();
     }
 
-    private void initContactList() {
-//        ThreadUtils.runOnSubThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-                    mCurrentUser = EMClient.getInstance().getCurrentUser();
-//                    mUserNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
-                    UsernameTest();
-                    for (int i = 0; i < mUserNames.size(); i++) {
+    private void loadContactFromServer() {
+        Observable.create(new Observable.OnSubscribe<Contact>() {
+            @Override
+            public void call(Subscriber<? super Contact> subscriber) {
+                try {
+                    List<String> contactsFromServer = getEMClientData();
+                    for (int i = 0; i < contactsFromServer.size(); i++) {
                         Contact contact = new Contact();
                         contact.avatar = i % 8;
-                        contact.name = mUserNames.get(i);
-                        contact.initial = getInitial(mUserNames.get(i));
-                        data.add(contact);
+                        contact.name = contactsFromServer.get(i);
+                        contact.initial = getInitial(contactsFromServer.get(i));
+                        subscriber.onNext(contact);
+                    }
+                    DBUtils.updateContacts(getContext(), mCurrentUser, data);
+                    loadContactFromDB();
+                    subscriber.onCompleted();
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                }
+            }
+        })
+                .onBackpressureBuffer(10000)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Contact>() {
+                    @Override
+                    public void onCompleted() {
+                        if (mContact_refresh.isRefreshing()) {
+                            mContact_refresh.setRefreshing(false);
+                        }
                     }
 
-                    //将数据保存到本地
-//                    DBUtils.getContacts(getContext(), mCurrentUser);
-//                    DBUtils.updateContacts(getContext(), mCurrentUser,mUserNames);
-//                } catch (HyphenateException e) {
-//                    e.printStackTrace();
-//                }
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(Contact contact) {
+                        data.add(contact);
+                    }
+                });
+    }
+
+    private List<String> getEMClientData() throws HyphenateException {
+        List<String> contactsFromServer = EMClient
+                .getInstance()
+                .contactManager()
+                .getAllContactsFromServer();
+        mCurrentUser = EMClient.getInstance().getCurrentUser();
+        return contactsFromServer;
+    }
+
+    private void loadContactFromDB() {
+        List<Contact> contacts = DBUtils.getContacts(getContext(), mCurrentUser);
+        data.clear();
+        data.addAll(contacts);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mContactRecyclerAdapter.notifyDataSetChanged();
             }
-//        });
+        });
+    }
 
-//    }
+    private void initRecycler(View view) {
+        mContact_recycler = (RecyclerView) view.findViewById(R.id.contact_recycler);
+        mContactRecyclerAdapter = new ContactRecyclerAdapter(getContext(), data);
+        mContact_recycler.setLayoutManager(new LinearLayoutManager(getContext()));//这里用线性显示 类似于listview
+        mContact_recycler.setAdapter(mContactRecyclerAdapter);
+    }
 
-    //    private List<String>
-    private void UsernameTest() {
-        mUserNames = new ArrayList<>();
-        mUserNames.add("asd");
-        mUserNames.add("asasd");
-        mUserNames.add("aswfgdd");
-        mUserNames.add("asdf");
-        mUserNames.add("bbasd");
-        mUserNames.add("不合法");
-        mUserNames.add("cc");
-        mUserNames.add("dd");
-        mUserNames.add("dasd");
-        mUserNames.add("easd");
-        mUserNames.add("fasd");
-        mUserNames.add("gasd");
-        mUserNames.add("hasd");
-        mUserNames.add("hasd");
-        mUserNames.add("jasd");
-        mUserNames.add("kasd");
-        mUserNames.add("lasd");
-        mUserNames.add("oasd");
-        mUserNames.add("人");
-        mUserNames.add("sfasd");
-        mUserNames.add("是打开链接发给");
-        mUserNames.add("qasd");
-        mUserNames.add("qasd");
-        mUserNames.add("qasd");
-        mUserNames.add("qahhsd");
-        mUserNames.add("wq");
+    private void initSwipeRefresh(View view) {
+        mContact_refresh = (SwipeRefreshLayout) view.findViewById(R.id.contact_refresh);
+        int blue = getResources().getColor(R.color.md_blue_500_color_code);
+        int pink = getResources().getColor(R.color.md_pink_500_color_code);
+        int teal = getResources().getColor(R.color.md_teal_500_color_code);
+        int grey = getResources().getColor(R.color.md_grey_500_color_code);
+        mContact_refresh.setColorSchemeColors(blue, pink, grey, teal);
+        mContact_refresh.setOnRefreshListener(this);
+
+        mContact_refresh.post(new Runnable() {
+            @Override
+            public void run() {
+                mContact_refresh.setRefreshing(true);
+            }
+        });
     }
 
     private String getInitial(String name) {
@@ -143,5 +175,10 @@ public class ContactFragment extends BaseFragment {
                 startActivity(new Intent(getContext(), AddContactActivity.class));
                 break;
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        loadContactFromServer();
     }
 }

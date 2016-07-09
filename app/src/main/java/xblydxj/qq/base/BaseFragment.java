@@ -1,6 +1,7 @@
 package xblydxj.qq.base;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import xblydxj.qq.R;
 
 public abstract class BaseFragment extends Fragment implements View.OnClickListener{
 
+    protected Handler mHandler = new Handler();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

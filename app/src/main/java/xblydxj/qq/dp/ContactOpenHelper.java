@@ -14,16 +14,15 @@ public class ContactOpenHelper extends SQLiteOpenHelper {
     }
 
     public ContactOpenHelper(Context context, String tableName) {
-        this(context, "c_content", null, 1);
+        this(context, "c_contact", null, 1);
         this.tableName = tableName;
     }
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table "+tableName+"(id integer, " +
-                "username varchar(30)," +
-                "contact varchar(20))");
+        db.execSQL("create table "+tableName+"(_id integer primary key, " +
+                "contact varchar(20), initial varchar(3), avatar integer)");
     }
 
     @Override

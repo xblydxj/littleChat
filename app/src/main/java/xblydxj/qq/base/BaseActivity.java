@@ -22,6 +22,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mSp = getSharedPreferences("config",MODE_PRIVATE);
         initView(savedInstanceState);
+        initData();
     }
 
     protected void startActivity(Class clazz, boolean isFinish) {
