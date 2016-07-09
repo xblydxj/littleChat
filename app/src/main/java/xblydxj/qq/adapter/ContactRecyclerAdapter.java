@@ -4,15 +4,16 @@ import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import xblydxj.qq.R;
 import xblydxj.qq.bean.Contact;
@@ -20,13 +21,14 @@ import xblydxj.qq.bean.Contact;
 /**
  * Created by 46321 on 2016/7/8/008.
  */
-public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ViewHolder> {
+public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecyclerAdapter.ViewHolder> implements SectionIndexer {
+    private static final String TAG = ContactRecyclerAdapter.class.getSimpleName();
     private List<Contact> ContactData = new ArrayList<>();
     private Context mContext;
 //    private int prePosition = 0;
-    public ContactRecyclerAdapter(Context context, Set<Contact> data) {
+    public ContactRecyclerAdapter(Context context, List<Contact> data) {
         mContext = context;
-        ContactData.addAll(data);
+        ContactData = data;
     }
 
     @Override
@@ -41,6 +43,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         setContactAvatar(holder, contact);
         holder.mContact_item_name.setText(contact.name);
         holder.mContact_item_letter.setText(contact.initial);
+        Log.d(TAG, "onBindViewHolder: "+contact.name);
         if (position != 0 && ContactData.get(position-1).initial.equals(contact.initial)) {
             Log.d("tag", "gone");
             holder.mContact_item_card.setVisibility(View.GONE);
@@ -83,6 +86,8 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         return ContactData.size();
     }
 
+
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView mContact_item_letter;
@@ -98,5 +103,34 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
             mContact_item_card = (CardView) itemView.findViewById(R.id.contact_item_card);
 
         }
+    }
+
+    //类似HashMap
+    private SparseIntArray mSparseIntArray = new SparseIntArray();
+
+    //返回统计当前adapter中数据总共可以划分为多少个section
+    @Override
+    public String[] getSections() {
+       //List<Contact> ContactData
+        List<String> sections = new ArrayList<>();
+        for (int i = 0; i < ContactData.size(); i++) {
+            String initial = ContactData.get(i).initial;
+            if (!sections.contains(initial)) {
+                sections.add(initial);
+                //记录section的索引和position，存入对应的键值对
+                mSparseIntArray.put(sections.size()-1,i);
+            }
+        }
+        return sections.toArray(new String[sections.size()]);
+    }
+    //传递一个section的索引号，返回该section第一个条目的position
+    @Override
+    public int getPositionForSection(int sectionIndex) {
+        return mSparseIntArray.get(sectionIndex);
+    }
+    //传递position返回section索引
+    @Override
+    public int getSectionForPosition(int position) {
+        return 0;
     }
 }

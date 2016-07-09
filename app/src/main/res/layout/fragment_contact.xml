@@ -10,37 +10,42 @@
         android:layout_height="0dp"
         android:layout_weight="1">
         <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_marginTop="3dp"
-            android:paddingRight="31dp"
             android:id="@+id/contact_recycler"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            >
 
         </android.support.v7.widget.RecyclerView>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <android.support.v7.widget.CardView
-                android:id="@+id/contact_slide_bar_card"
+            <!--<android.support.v7.widget.CardView-->
+            <!--android:id="@+id/contact_slide_bar_card"-->
+            <!--android:layout_width="26dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentEnd="true"-->
+            <!--android:layout_margin="5dp"-->
+            <!--android:paddingBottom="3dp"-->
+            <!--android:paddingTop="3dp"-->
+            <!--app:cardBackgroundColor="#ffffff"-->
+            <!--app:cardCornerRadius="7dp"-->
+            <!--app:cardElevation="5dp">-->
+            <xblydxj.qq.widget.SlideBar
+                android:id="@+id/contact_slide_bar"
                 android:layout_width="26dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
                 android:layout_margin="5dp"
                 android:paddingBottom="3dp"
                 android:paddingTop="3dp"
-                app:cardBackgroundColor="#ffffff"
-                app:cardCornerRadius="7dp"
-                app:cardElevation="5dp">
-                <xblydxj.qq.widget.SlideBar
-                    android:id="@+id/contact_slide_bar"
-                    android:layout_width="26dp"
-                    android:layout_height="match_parent"
-                >
-                </xblydxj.qq.widget.SlideBar>
-            </android.support.v7.widget.CardView>
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+            >
+            </xblydxj.qq.widget.SlideBar>
+            <!--</android.support.v7.widget.CardView>-->
             <android.support.v7.widget.CardView
                 android:id="@+id/contact_center_tip_card"
                 android:layout_width="wrap_content"
+                android:visibility="invisible"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 app:cardCornerRadius="5dp"
@@ -48,6 +53,7 @@
                 <TextView
                     android:id="@+id/contact_center_tip"
                     android:layout_width="wrap_content"
+
                     android:layout_height="wrap_content"
                     android:background="@drawable/rectangle_contact_sign"
                     android:padding="17dp"

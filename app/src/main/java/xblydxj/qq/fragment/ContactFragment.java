@@ -11,11 +11,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hyphenate.chat.EMClient;
+
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import xblydxj.qq.R;
 import xblydxj.qq.activity.AddContactActivity;
@@ -29,6 +28,8 @@ import xblydxj.qq.widget.SlideBar;
  * Created by 46321 on 2016/7/8/008.
  */
 public class ContactFragment extends BaseFragment {
+    private static final String TAG = ContactFragment.class.getSimpleName();
+
     private RecyclerView contact_recycler;
     private SlideBar contact_slide_bar;
     private CardView contact_slide_bar_card;
@@ -36,14 +37,15 @@ public class ContactFragment extends BaseFragment {
     private CardView contact_center_tip_card;
     private RecyclerView mContact_recycler;
 
-    private Set<Contact> data = new TreeSet<>(new Comparator<Contact>() {
+    private List<Contact> data = new ArrayList<>();/*new Comparator<Contact>() {
         @Override
         public int compare(Contact preContact, Contact contact) {
             int i = (int) preContact.initial.charAt(0) - (int) contact.initial.charAt(0);
-            return i==0?1:i;
+            return i == 0 ? 1 : i;
         }
-    });
+    });*/
     private List<String> mUserNames;
+    private String mCurrentUser;
 
     public ContactFragment() {
     }
@@ -64,58 +66,70 @@ public class ContactFragment extends BaseFragment {
     protected void initData(View view) {
         initContactList();
         mContact_recycler = (RecyclerView) view.findViewById(R.id.contact_recycler);
-        if (data.size() == 0) {
-            return;
+        if (data != null && data.size() > 0) {
+            ContactRecyclerAdapter contactRecyclerAdapter = new ContactRecyclerAdapter(getContext(), data);
+            mContact_recycler.setLayoutManager(new LinearLayoutManager(getContext()));//这里用线性显示 类似于listview
+            mContact_recycler.setAdapter(contactRecyclerAdapter);
+            contactRecyclerAdapter.notifyDataSetChanged();
         }
-        ContactRecyclerAdapter contactRecyclerAdapter = new ContactRecyclerAdapter(getContext(), data);
-        mContact_recycler.setLayoutManager(new LinearLayoutManager(getContext()));//这里用线性显示 类似于listview
-        mContact_recycler.setAdapter(contactRecyclerAdapter);
     }
 
     private void initContactList() {
-//        try {
-//            mUserNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
-            UsernameTest();
-            for (int i = 0; i < mUserNames.size(); i++) {
-                Contact contact = new Contact();
-                contact.avatar = i % 8;
-                contact.name = mUserNames.get(i);
-                contact.initial = getInitial(mUserNames.get(i));
-                data.add(contact);
-            }
-//        } catch (HyphenateException e) {
-//            e.printStackTrace();
-//        }
-    }
+//        ThreadUtils.runOnSubThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+                    mCurrentUser = EMClient.getInstance().getCurrentUser();
+//                    mUserNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
+                    UsernameTest();
+                    for (int i = 0; i < mUserNames.size(); i++) {
+                        Contact contact = new Contact();
+                        contact.avatar = i % 8;
+                        contact.name = mUserNames.get(i);
+                        contact.initial = getInitial(mUserNames.get(i));
+                        data.add(contact);
+                    }
 
+                    //将数据保存到本地
+//                    DBUtils.getContacts(getContext(), mCurrentUser);
+//                    DBUtils.updateContacts(getContext(), mCurrentUser,mUserNames);
+//                } catch (HyphenateException e) {
+//                    e.printStackTrace();
+//                }
+            }
+//        });
+
+//    }
+
+    //    private List<String>
     private void UsernameTest() {
         mUserNames = new ArrayList<>();
         mUserNames.add("asd");
         mUserNames.add("asasd");
         mUserNames.add("aswfgdd");
-        mUserNames.add("sfasd");
-        mUserNames.add("bbasd");
-        mUserNames.add("easd");
-        mUserNames.add("hasd");
-        mUserNames.add("qasd");
-        mUserNames.add("是打开链接发给");
-        mUserNames.add("不合法");
-        mUserNames.add("人");
         mUserNames.add("asdf");
-        mUserNames.add("qasd");
+        mUserNames.add("bbasd");
+        mUserNames.add("不合法");
         mUserNames.add("cc");
-        mUserNames.add("qasd");
         mUserNames.add("dd");
+        mUserNames.add("dasd");
+        mUserNames.add("easd");
+        mUserNames.add("fasd");
+        mUserNames.add("gasd");
+        mUserNames.add("hasd");
+        mUserNames.add("hasd");
+        mUserNames.add("jasd");
+        mUserNames.add("kasd");
+        mUserNames.add("lasd");
+        mUserNames.add("oasd");
+        mUserNames.add("人");
+        mUserNames.add("sfasd");
+        mUserNames.add("是打开链接发给");
+        mUserNames.add("qasd");
+        mUserNames.add("qasd");
+        mUserNames.add("qasd");
         mUserNames.add("qahhsd");
         mUserNames.add("wq");
-        mUserNames.add("oasd");
-        mUserNames.add("lasd");
-        mUserNames.add("kasd");
-        mUserNames.add("jasd");
-        mUserNames.add("hasd");
-        mUserNames.add("gasd");
-        mUserNames.add("fasd");
-        mUserNames.add("dasd");
     }
 
     private String getInitial(String name) {
@@ -126,7 +140,7 @@ public class ContactFragment extends BaseFragment {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_right:
-                startActivity(new Intent(getContext(),AddContactActivity.class));
+                startActivity(new Intent(getContext(), AddContactActivity.class));
                 break;
         }
     }

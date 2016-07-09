@@ -29,7 +29,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SplashActivity" android:theme="@style/AppThemeFullScreen">
+        <activity android:name=".activity.SplashActivity"
+                  android:theme="@style/AppThemeFullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -51,7 +52,7 @@
 
 
         <!-- 设置环信应用的AppKey -->
-        <meta-data android:name="EASEMOB_APPKEY" android:value="itheima4#qq10"/>
+        <meta-data android:name="EASEMOB_APPKEY" android:value="15726814582#qq"/>
         <!-- 声明SDK所需的service SDK核心功能-->
         <service android:name="com.hyphenate.chat.EMChatService" android:exported="true"/>
         <!-- 声明SDK所需的receiver -->

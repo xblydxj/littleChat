@@ -147,6 +147,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         }
         final ProgressDialog progressDialog = makeDialog("登录成功");
         progressDialog.show();
+        //保存用户名和密码
         EMClient.getInstance().login(username, password, getTag(progressDialog));
 
     }
