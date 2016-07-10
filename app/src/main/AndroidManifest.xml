@@ -37,7 +37,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".activity.MainActivity" android:launchMode="singleTask">
         </activity>
         <activity android:name=".activity.AddContactActivity"/>
         <activity android:name=".activity.LoginActivity"
@@ -49,7 +49,7 @@
             <!--</intent-filter>-->
         </activity>
         <activity android:name=".activity.RegisterActivity"/>
-
+        <activity android:name=".activity.ChatActivity"/>
 
         <!-- 设置环信应用的AppKey -->
         <meta-data android:name="EASEMOB_APPKEY" android:value="15726814582#qq"/>

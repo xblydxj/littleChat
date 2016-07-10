@@ -12,10 +12,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMConversation;
 import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -23,7 +28,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import xblydxj.qq.R;
 import xblydxj.qq.activity.AddContactActivity;
+import xblydxj.qq.activity.ChatActivity;
 import xblydxj.qq.adapter.ContactRecyclerAdapter;
+import xblydxj.qq.base.BaseActivity;
 import xblydxj.qq.base.BaseFragment;
 import xblydxj.qq.bean.Contact;
 import xblydxj.qq.utils.DBUtils;
@@ -32,13 +39,13 @@ import xblydxj.qq.utils.PinyinUtils;
 /**
  * Created by 46321 on 2016/7/8/008.
  */
-public class ContactFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class ContactFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,ContactRecyclerAdapter.OnItemClickListener{
     private static final String TAG = ContactFragment.class.getSimpleName();
 
     private RecyclerView mContact_recycler;
 
     private List<Contact> data = new ArrayList<>();
-
+    private List<EMConversation> conversationList = new ArrayList<>();
     private String mCurrentUser;
     private SwipeRefreshLayout mContact_refresh;
     private ContactRecyclerAdapter mContactRecyclerAdapter;
@@ -137,10 +144,27 @@ public class ContactFragment extends BaseFragment implements SwipeRefreshLayout.
     private void initRecycler(View view) {
         mContact_recycler = (RecyclerView) view.findViewById(R.id.contact_recycler);
         mContactRecyclerAdapter = new ContactRecyclerAdapter(getContext(), data);
+        mContactRecyclerAdapter.setOnItemClickListener(this);
         mContact_recycler.setLayoutManager(new LinearLayoutManager(getContext()));//这里用线性显示 类似于listview
+        updateConversation();
         mContact_recycler.setAdapter(mContactRecyclerAdapter);
     }
 
+    public void updateConversation() {
+        Map<String, EMConversation> allConversations = EMClient.getInstance().chatManager().getAllConversations();
+        conversationList.clear();
+        //将HashMap的所有的值，放到 集合中
+        Collection<EMConversation> values = allConversations.values();
+        conversationList.addAll(values);
+        //排序：按照会话的最后一条消息的时间的倒序
+        Collections.sort(conversationList, new Comparator<EMConversation>() {
+            @Override
+            public int compare(EMConversation lhs, EMConversation rhs) {
+                return (int) (rhs.getLastMessage().getMsgTime() - lhs.getLastMessage().getMsgTime());
+            }
+        });
+        mContactRecyclerAdapter.notifyDataSetChanged();
+    }
     private void initSwipeRefresh(View view) {
         mContact_refresh = (SwipeRefreshLayout) view.findViewById(R.id.contact_refresh);
         int blue = getResources().getColor(R.color.md_blue_500_color_code);
@@ -171,8 +195,17 @@ public class ContactFragment extends BaseFragment implements SwipeRefreshLayout.
         }
     }
 
+
     @Override
     public void onRefresh() {
         loadContactFromServer();
+    }
+
+    @Override
+    public void onItemClick(String conversation) {
+//        String username = contact.name;
+        Intent intent = new Intent(getActivity(), ChatActivity.class);
+        intent.putExtra(BaseActivity.SP_KEY_USERNAME,conversation);
+        startActivity(intent);
     }
 }

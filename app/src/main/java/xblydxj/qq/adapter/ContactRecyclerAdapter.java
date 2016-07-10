@@ -31,6 +31,16 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
         ContactData = data;
     }
 
+
+    public interface OnItemClickListener{
+        void onItemClick(String conversation);
+    }
+    private OnItemClickListener onItemClickListener;
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
+    }
+
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext())
@@ -39,7 +49,7 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Contact contact = ContactData.get(position);
+        final Contact contact = ContactData.get(position);
         setContactAvatar(holder, contact);
         holder.mContact_item_name.setText(contact.name);
         holder.mContact_item_letter.setText(contact.initial);
@@ -49,6 +59,15 @@ public class ContactRecyclerAdapter extends RecyclerView.Adapter<ContactRecycler
             holder.mContact_item_card.setVisibility(View.GONE);
         }else {
             holder.mContact_item_card.setVisibility(View.VISIBLE);
+        }
+
+        if (onItemClickListener!=null){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemClickListener.onItemClick(contact.name);
+                }
+            });
         }
     }
 

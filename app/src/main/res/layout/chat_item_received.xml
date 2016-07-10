@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
     <TextView
         android:id="@+id/chat_item_time"
@@ -26,7 +26,6 @@
             android:id="@+id/chat_item_message"
             android:layout_margin="5dp"
             android:layout_toRightOf="@+id/chat_item_avatar"
-            android:layout_toR="@+id/chat_item_avatar"
             android:text="asjkdhf阿萨德路附近爱丽丝快递asdfasdfasdfasdfasfdasd劫"
             android:background="@drawable/receive_msg_normal"
             android:layout_width="wrap_content"

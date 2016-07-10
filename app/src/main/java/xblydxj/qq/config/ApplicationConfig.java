@@ -39,13 +39,12 @@ import xblydxj.qq.utils.ToastUtil;
 public class ApplicationConfig extends Application {
     private static final String TAG = "ApplicationConfig";
     private List<BaseActivity> activityList = new ArrayList<>();
-    private SoundPool mSoundPool;
+    private SoundPool soundPool;
     private int shortRing;
     private int longRing;
     private NotificationManager mNotificationManager;
     private Bitmap mBitmap;
     private Handler mHandler = new Handler();
-    private SoundPool mSoundPool1;
 
     @Override
     public void onCreate() {
@@ -112,10 +111,10 @@ public class ApplicationConfig extends Application {
             @Override
             public void onMessageReceived(List<EMMessage> list) {
                 if (isRunningInBackground()) {
-                    mSoundPool.play(longRing, 1, 1, 1, 0, 1);
+                    soundPool.play(longRing, 1, 1, 1, 0, 1);
                     showNotification(list);
                 } else {
-                    mSoundPool.play(shortRing, 1, 1, 1, 0, 1);
+                    soundPool.play(shortRing, 1, 1, 1, 0, 1);
                 }
             }
         });
@@ -163,9 +162,9 @@ public class ApplicationConfig extends Application {
     }
 
     private void initSoundPool() {
-        mSoundPool1 = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
-        shortRing = mSoundPool.load(this, R.raw.duan, 1);
-        longRing = mSoundPool.load(this, R.raw.yulu, 1);
+        soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+        shortRing = soundPool.load(this, R.raw.duan, 1);
+        longRing = soundPool.load(this, R.raw.yulu, 1);
     }
 
     private void initHuaxin() {
