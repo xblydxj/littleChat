@@ -36,4 +36,8 @@ public class ConversationFragment extends BaseFragment {
     public void onClick(View v) {
 
     }
+
+    public void updateConversation() {
+
+    }
 }

@@ -13,7 +13,6 @@ public class SplashActivity extends Activity {
 
     private Handler mHandler = new Handler();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +26,7 @@ public class SplashActivity extends Activity {
                 @Override
                 public void run() {
                     startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+                    finish();
                 }
             },2000);
 

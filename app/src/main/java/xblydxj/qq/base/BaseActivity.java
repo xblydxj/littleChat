@@ -9,12 +9,14 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import xblydxj.qq.config.ApplicationConfig;
 import xblydxj.qq.utils.DialogUtil;
 import xblydxj.qq.utils.ToastUtil;
 
 public abstract class BaseActivity extends AppCompatActivity {
     protected SharedPreferences mSp;
-    Handler handler = new Handler();
+    protected Handler handler = new Handler();
+    private ApplicationConfig mApplicationConfig;
     public static final String SP_KEY_USERNAME = "username";
     public static final String SP_KEY_PASSWORD = "password";
     @Override
@@ -23,6 +25,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         mSp = getSharedPreferences("config",MODE_PRIVATE);
         initView(savedInstanceState);
         initData();
+        mApplicationConfig = (ApplicationConfig) getApplication();
+        mApplicationConfig.addActivity(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mApplicationConfig.removeActivity(this);
     }
 
     protected void startActivity(Class clazz, boolean isFinish) {

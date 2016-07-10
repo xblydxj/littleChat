@@ -145,11 +145,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             mEt_password.requestFocus(View.FOCUS_RIGHT);
             return;
         }
-        final ProgressDialog progressDialog = makeDialog("登录成功");
+        final ProgressDialog progressDialog =  makeDialog("正在登陆...");
         progressDialog.show();
         //保存用户名和密码
         EMClient.getInstance().login(username, password, getTag(progressDialog));
-
     }
 
     @NonNull
@@ -165,6 +164,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             @Override
             public void onError(int i, String s) {
                 showToast("登录失败" + s);
+                progressDialog.dismiss();
             }
 
             @Override

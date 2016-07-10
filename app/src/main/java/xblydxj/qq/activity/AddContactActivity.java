@@ -1,10 +1,11 @@
 package xblydxj.qq.activity;
 
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,7 +23,7 @@ import cn.bmob.v3.listener.FindListener;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import xblydxj.qq.R;
 import xblydxj.qq.adapter.SearchUserAdapter;
@@ -42,11 +43,11 @@ public class AddContactActivity extends BaseActivity implements View.OnClickList
     private EditText add_contact_et;
     private ImageView add_contact_search;
     private RecyclerView add_contact_recycler;
-    private Animation mShake;
     private List<User> mSearchResult = new ArrayList<>();
     private String mCurrentUser;
     private LinearLayout mNo_data;
     private SearchUserAdapter mAdapter;
+    private CardView mLayout_search;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -56,11 +57,13 @@ public class AddContactActivity extends BaseActivity implements View.OnClickList
         iv_right = (ImageView) findViewById(R.id.iv_right);
         add_contact_et = (EditText) findViewById(R.id.add_contact_et);
         add_contact_search = (ImageView) findViewById(R.id.add_contact_search);
+        mLayout_search = (CardView) findViewById(R.id.add_contact_search_layout);
         add_contact_recycler = (RecyclerView) findViewById(R.id.add_contact_recycler);
         mNo_data = (LinearLayout) findViewById(R.id.add_contact_no_data);
         iv_left.setVisibility(View.VISIBLE);
         iv_right.setVisibility(View.GONE);
         tv_title.setText("添加好友");
+        iv_left.setOnClickListener(this);
         add_contact_search.setOnClickListener(this);
         initRecyclerAdapter();
     }
@@ -82,14 +85,19 @@ public class AddContactActivity extends BaseActivity implements View.OnClickList
             @Override
             public void OnItemButtonClick(String username) {
                 Observable.just(username)
-                        .doOnNext(new Action1<String>() {
+                        .map(new Func1<String, String>() {
                             @Override
-                            public void call(String s) {
+                            public String call(String s) {
                                 try {
+                                    Log.d("tag", "add");
                                     EMClient.getInstance().contactManager().addContact(s, "Boom shakalaka");
                                 } catch (HyphenateException e) {
                                     e.printStackTrace();
+                                    Log.d("tag", "failed");
+                                    return "添加失败"+s;
                                 }
+                                Log.d("tag", "successed");
+                                return "添加成功"+s;
                             }
                         })
                         .subscribeOn(Schedulers.io())
@@ -97,6 +105,7 @@ public class AddContactActivity extends BaseActivity implements View.OnClickList
                         .subscribe(new Subscriber<String>() {
                             @Override
                             public void onCompleted() {
+                                Log.d("tag", "completed");
                             }
 
                             @Override
@@ -106,8 +115,8 @@ public class AddContactActivity extends BaseActivity implements View.OnClickList
 
                             @Override
                             public void onNext(String s) {
-                                showToast("添加成功"+s);
-
+                                Log.d("tag", "show");
+                                showToast(s);
                             }
                         });
             }
@@ -130,8 +139,7 @@ public class AddContactActivity extends BaseActivity implements View.OnClickList
     private void onSearch() {
         String keyword = add_contact_et.getText().toString().trim();
         if ("".equals(keyword)) {
-            mShake = AnimationUtils.loadAnimation(this, R.anim.shake);
-            mShake.start();
+            mLayout_search.startAnimation(AnimationUtils.loadAnimation(this,R.anim.shake));
             return;
         }
         BmobQuery<User> query = new BmobQuery<>();
