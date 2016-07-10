@@ -12,13 +12,13 @@
         android:layout_margin="8dp"
         android:text="23:12:23"/>
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="330dp"
         android:layout_height="wrap_content"
         >
 
         <ImageView
             android:id="@+id/chat_item_avatar"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="60dp"
             android:layout_margin="5dp"
             android:src="@drawable/avatar3"/>

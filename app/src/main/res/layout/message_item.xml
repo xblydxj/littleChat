@@ -13,7 +13,7 @@
     >
         <ImageView
             android:id="@+id/message_avatar"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="10dp"
             android:src="@drawable/avatar3"/>
